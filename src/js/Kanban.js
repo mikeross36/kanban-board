@@ -3,8 +3,8 @@ import Column from "./Column.js";
 class Kanban {
     constructor(kanban){
         this.kanban = kanban;
-
-        Kanban.columns().forEach(column => {
+        const kanbanColumns = Kanban.columns()
+        kanbanColumns.forEach(column => {
             const newColumn = new Column(column.id, column.title)
             this.kanban.appendChild(newColumn.rangeElements.column)
         })
