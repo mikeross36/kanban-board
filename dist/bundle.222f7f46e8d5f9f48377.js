@@ -15,6 +15,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Item_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Item.js */ "./src/js/Item.js");
 /* harmony import */ var _KanbanApi_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./KanbanApi.js */ "./src/js/KanbanApi.js");
 /* harmony import */ var _DropZone_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DropZone.js */ "./src/js/DropZone.js");
+
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -27,42 +29,88 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var Column = /*#__PURE__*/function () {
   function Column(id, title) {
-    var _this = this;
-
     _classCallCheck(this, Column);
 
-    var dropZoneAbove = _DropZone_js__WEBPACK_IMPORTED_MODULE_2__["default"].createDropZone();
     this.rangeElements = {};
-    this.rangeElements.column = Column.createColumn();
-    this.rangeElements.title = this.rangeElements.column.querySelector(".kanban-column-title");
-    this.rangeElements.items = this.rangeElements.column.querySelector(".kanban-column-items");
-    this.rangeElements.addItemBtn = this.rangeElements.column.querySelector(".add-item-btn");
-    this.rangeElements.column.dataset.id = id;
-    this.rangeElements.title.textContent = title;
-    this.rangeElements.items.appendChild(dropZoneAbove);
-    this.rangeElements.addItemBtn.addEventListener("click", function () {
-      var newItem = _KanbanApi_js__WEBPACK_IMPORTED_MODULE_1__["default"].addColumnItem(id, "");
-
-      _this.renderItem(newItem);
-    });
-    _KanbanApi_js__WEBPACK_IMPORTED_MODULE_1__["default"].getColumnItems(id).forEach(function (item) {
-      _this.renderItem(item);
-    });
+    this.setColumn(id);
+    this.setTitle(title);
+    this.setColumnItems();
+    this.setAddItemBtn();
+    this.setDropAbove();
+    this.addNewItem(id);
+    this.setKanbanApi(id);
   }
 
   _createClass(Column, [{
+    key: "setColumn",
+    value: function setColumn(id) {
+      this.rangeElements.column = Column.createColumn();
+      this.rangeElements.column.dataset.id = id;
+    }
+  }, {
+    key: "setTitle",
+    value: function setTitle(title) {
+      var titleEl = this.rangeElements.column.querySelector(".kanban-column-title");
+
+      if (titleEl) {
+        this.rangeElements.title = titleEl;
+        this.rangeElements.title.textContent = title;
+      }
+    }
+  }, {
+    key: "setColumnItems",
+    value: function setColumnItems() {
+      var itemsEl = this.rangeElements.column.querySelector(".kanban-column-items");
+      if (itemsEl) this.rangeElements.items = itemsEl;
+    }
+  }, {
+    key: "setAddItemBtn",
+    value: function setAddItemBtn() {
+      var btnEl = this.rangeElements.column.querySelector(".add-item-btn");
+      if (btnEl) this.rangeElements.addItemBtn = btnEl;
+    }
+  }, {
     key: "renderItem",
-    value: function renderItem(itemData) {
-      var item = new _Item_js__WEBPACK_IMPORTED_MODULE_0__["default"](itemData.id, itemData.content);
-      this.rangeElements.items.appendChild(item.rangeElements.item);
+    value: function renderItem(props) {
+      var item = new _Item_js__WEBPACK_IMPORTED_MODULE_0__["default"](props.id, props.content);
+      if (item) this.rangeElements.items.appendChild(item.rangeElements.item);
+    }
+  }, {
+    key: "setKanbanApi",
+    value: function setKanbanApi(id) {
+      var _this = this;
+
+      var columnItems = _KanbanApi_js__WEBPACK_IMPORTED_MODULE_1__["default"].getColumnItems(id);
+      if (columnItems) columnItems.forEach(function (item) {
+        return _this.renderItem(item);
+      });
+    }
+  }, {
+    key: "addNewItem",
+    value: function addNewItem(id) {
+      var _this2 = this;
+
+      this.rangeElements.addItemBtn.addEventListener("click", function () {
+        var newItem = _KanbanApi_js__WEBPACK_IMPORTED_MODULE_1__["default"].addColumnItem(id, "");
+        if (newItem) _this2.renderItem(newItem);
+      });
+    }
+  }, {
+    key: "setDropAbove",
+    value: function setDropAbove() {
+      var dropZoneAbove = _DropZone_js__WEBPACK_IMPORTED_MODULE_2__["default"].setDropZone();
+      if (dropZoneAbove) this.rangeElements.items.appendChild(dropZoneAbove);
     }
   }], [{
     key: "createColumn",
     value: function createColumn() {
       var range = document.createRange();
-      range.selectNode(document.body);
-      var tagString = "\n            <div class=\"kanban-column\">\n                <h2 class=\"kanban-column-title\"></h2>\n                <div class=\"kanban-column-items\"></div>\n                <button class=\"add-item-btn\" type=\"button\">add</button>\n            </div>";
-      return range.createContextualFragment(tagString).children[0];
+      var tagString = "\n            <div class=\"kanban-column\">\n                <h2 class=\"kanban-column-title\"></h2>\n                <div class=\"kanban-column-items\"></div>\n                <button class=\"add-item-btn\" type=\"button\">add</button>\n            </div>\n        ";
+
+      if (range) {
+        range.selectNode(document.body);
+        return range.createContextualFragment(tagString).children[0];
+      }
     }
   }]);
 
@@ -84,6 +132,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _KanbanApi_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./KanbanApi.js */ "./src/js/KanbanApi.js");
+
+
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -110,19 +160,10 @@ var DropZone = /*#__PURE__*/function () {
   }
 
   _createClass(DropZone, null, [{
-    key: "createDropZone",
-    value: function createDropZone() {
-      var range = document.createRange();
-      range.selectNode(document.body);
-      var tagString = "<div class=\"kanban-dropzone\"></div>";
-      var dropZone = range.createContextualFragment(tagString).children[0];
-      dropZone.addEventListener("dragover", function (e) {
-        e.preventDefault();
-        dropZone.classList.add("kanban-dropzone-active");
-      });
-      dropZone.addEventListener("dragleave", function () {
-        dropZone.classList.remove("kanban-dropzone-active");
-      });
+    key: "setDropZone",
+    value: function setDropZone() {
+      var dropZone = DropZone.createDropZone();
+      DropZone.setDrop(dropZone);
       dropZone.addEventListener("drop", function (e) {
         e.preventDefault();
         dropZone.classList.remove("kanban-dropzone-active");
@@ -131,22 +172,41 @@ var DropZone = /*#__PURE__*/function () {
 
         var dropZonesInColumn = _toConsumableArray(dropZoneColumn.querySelectorAll(".kanban-dropzone"));
 
-        var dropZoneIndex = dropZonesInColumn.indexOf(dropZone);
+        var dropZonePosition = dropZonesInColumn.indexOf(dropZone);
         var itemId = +e.dataTransfer.getData("text/plain");
-        var droppedItem = document.querySelector("[data-id=\"".concat(itemId, "\"]"));
-        var insertAfter = dropZone.parentElement.classList.contains("kanban-item") ? dropZone.parentElement : dropZone;
-
-        if (droppedItem.contains(dropZone)) {
-          return;
-        }
-
-        insertAfter.after(droppedItem);
+        var dropItem = document.querySelector("[data-id=\"".concat(itemId, "\"]"));
+        var dropTarget = dropZone.parentElement.classList.contains("kanba-item") ? dropZone.parentElement : dropZone;
+        if (dropItem.contains(dropZone)) return;
+        dropTarget.after(dropItem);
         _KanbanApi_js__WEBPACK_IMPORTED_MODULE_0__["default"].updateItem(itemId, {
           columnId: columnId,
-          position: dropZoneIndex
+          position: dropZonePosition
         });
       });
       return dropZone;
+    }
+  }, {
+    key: "setDrop",
+    value: function setDrop(dropZone) {
+      dropZone.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        dropZone.classList.add("kanban-dropzone-active");
+      });
+      dropZone.addEventListener("dragleave", function () {
+        dropZone.classList.remove("kanban-dropzone-active");
+      });
+    }
+  }, {
+    key: "createDropZone",
+    value: function createDropZone() {
+      var range = document.createRange();
+      var tagString = "<div class=\"kanban-dropzone\"></div>";
+
+      if (range) {
+        range.selectNode(document.body);
+        var dropZone = range.createContextualFragment(tagString).children[0];
+        return dropZone;
+      }
     }
   }]);
 
@@ -169,6 +229,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _KanbanApi_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./KanbanApi.js */ "./src/js/KanbanApi.js");
 /* harmony import */ var _DropZone_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DropZone.js */ "./src/js/DropZone.js");
+
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -180,59 +242,94 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var Item = /*#__PURE__*/function () {
   function Item(id, content) {
-    var _this = this;
-
     _classCallCheck(this, Item);
 
-    var dropZoneBelowe = _DropZone_js__WEBPACK_IMPORTED_MODULE_1__["default"].createDropZone();
     this.rangeElements = {};
-    this.rangeElements.item = Item.createItem();
-    this.rangeElements.itemInput = this.rangeElements.item.querySelector(".kanban-item-input");
-    this.rangeElements.item.dataset.id = id;
-    this.rangeElements.itemInput.textContent = content;
+    this.setItem(id);
+    this.setItemContent(content);
     this.content = content;
-    this.rangeElements.item.appendChild(dropZoneBelowe);
-
-    var updateItemsContent = function updateItemsContent() {
-      var newContent = _this.rangeElements.itemInput.textContent.trim();
-
-      if (newContent === _this.content) {
-        return;
-      }
-
-      _this.content = newContent;
-      _KanbanApi_js__WEBPACK_IMPORTED_MODULE_0__["default"].updateItem(id, {
-        content: _this.content
-      });
-    };
-
-    this.rangeElements.itemInput.addEventListener("blur", updateItemsContent);
-    this.rangeElements.item.addEventListener("dblclick", function () {
-      var check = confirm("Are you sure sou want to delete this item?");
-
-      if (check) {
-        _KanbanApi_js__WEBPACK_IMPORTED_MODULE_0__["default"].deleteItem(id);
-
-        _this.rangeElements.itemInput.removeEventListener("blur", updateItemsContent);
-
-        _this.rangeElements.item.parentElement.removeChild(_this.rangeElements.item);
-      }
-    });
-    this.rangeElements.item.addEventListener("dragstart", function (e) {
-      e.dataTransfer.setData("text/plain", id);
-    });
-    this.rangeElements.itemInput.addEventListener("drop", function (e) {
-      e.preventDefault();
-    });
+    this.updateItemContent(id);
+    this.removeItem(id);
+    this.setDropBelow();
+    this.setDragAndDrop(id);
   }
 
-  _createClass(Item, null, [{
+  _createClass(Item, [{
+    key: "setItem",
+    value: function setItem(id) {
+      this.rangeElements.item = Item.createItem();
+      this.rangeElements.item.dataset.id = id;
+    }
+  }, {
+    key: "setItemContent",
+    value: function setItemContent(content) {
+      var contentEl = this.rangeElements.item.querySelector(".kanban-item-content");
+
+      if (contentEl) {
+        this.rangeElements.itemContent = contentEl;
+        this.rangeElements.itemContent.textContent = content;
+      }
+    }
+  }, {
+    key: "updateItemContent",
+    value: function updateItemContent(id) {
+      var _this = this;
+
+      var updateContent = function updateContent() {
+        var newContent = _this.rangeElements.itemContent.textContent.trim();
+
+        if (newContent === _this.content) return;
+        _this.content = newContent;
+        _KanbanApi_js__WEBPACK_IMPORTED_MODULE_0__["default"].updateItem(id, {
+          content: _this.content
+        });
+      };
+
+      this.rangeElements.itemContent.addEventListener("blur", updateContent);
+    }
+  }, {
+    key: "removeItem",
+    value: function removeItem(id) {
+      var _this2 = this;
+
+      this.rangeElements.item.addEventListener("dblclick", function () {
+        var check = confirm("Are you sure your want to delete this item?");
+
+        if (check) {
+          _KanbanApi_js__WEBPACK_IMPORTED_MODULE_0__["default"].deleteColumnItem(id);
+
+          _this2.rangeElements.itemContent.removeEventListener("blur", _this2.updateItemContent);
+
+          _this2.rangeElements.item.parentElement.removeChild(_this2.rangeElements.item);
+        }
+      });
+    }
+  }, {
+    key: "setDropBelow",
+    value: function setDropBelow() {
+      var dropZoneBelow = _DropZone_js__WEBPACK_IMPORTED_MODULE_1__["default"].setDropZone();
+      if (dropZoneBelow) this.rangeElements.item.appendChild(dropZoneBelow);
+    }
+  }, {
+    key: "setDragAndDrop",
+    value: function setDragAndDrop(id) {
+      this.rangeElements.item.addEventListener("dragstart", function (e) {
+        e.dataTransfer.setData("text/plain", id);
+      });
+      this.rangeElements.itemContent.addEventListener("drop", function (e) {
+        e.preventDefault();
+      });
+    }
+  }], [{
     key: "createItem",
     value: function createItem() {
       var range = document.createRange();
-      range.selectNode(document.body);
-      var tagString = "\n            <div class=\"kanban-item\" draggable=\"true\">\n                <div class=\"kanban-item-input\" contenteditable></div>\n            </div>";
-      return range.createContextualFragment(tagString).children[0];
+      var tagString = "\n            <div class=\"kanban-item\" draggable=\"true\">\n                <div class=\"kanban-item-content\" contenteditable></div>\n            </div>\n        ";
+
+      if (range) {
+        range.selectNode(document.body);
+        return range.createContextualFragment(tagString).children[0];
+      }
     }
   }]);
 
@@ -254,6 +351,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _Column_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Column.js */ "./src/js/Column.js");
+
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -269,7 +368,8 @@ var Kanban = /*#__PURE__*/function () {
     _classCallCheck(this, Kanban);
 
     this.kanban = kanban;
-    Kanban.columns().forEach(function (column) {
+    var kanbanColumns = Kanban.columns();
+    kanbanColumns.forEach(function (column) {
       var newColumn = new _Column_js__WEBPACK_IMPORTED_MODULE_0__["default"](column.id, column.title);
 
       _this.kanban.appendChild(newColumn.rangeElements.column);
@@ -309,6 +409,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var _apiHelpers_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./apiHelpers.js */ "./src/js/apiHelpers.js");
+
+
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -329,7 +432,8 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
-// import {v4 as uuidv4} from uuidv4;
+
+
 var KanbanApi = /*#__PURE__*/function () {
   function KanbanApi() {
     _classCallCheck(this, KanbanApi);
@@ -338,43 +442,43 @@ var KanbanApi = /*#__PURE__*/function () {
   _createClass(KanbanApi, null, [{
     key: "getColumnItems",
     value: function getColumnItems(columnId) {
-      var column = getDataFromStorage().find(function (column) {
-        return column.id === columnId;
+      var storageData = (0,_apiHelpers_js__WEBPACK_IMPORTED_MODULE_0__.getDataFromStorage)();
+      var column = storageData.find(function (data) {
+        return data.id === columnId;
       });
-
-      if (!column) {
-        return [];
-      }
-
+      if (!column) return [];
       return column.items;
     }
   }, {
     key: "addColumnItem",
     value: function addColumnItem(columnId, content) {
-      var data = getDataFromStorage();
-      var column = data.find(function (column) {
-        return column.id === columnId;
+      var storageData = (0,_apiHelpers_js__WEBPACK_IMPORTED_MODULE_0__.getDataFromStorage)();
+      var column = storageData.find(function (data) {
+        return data.id === columnId;
       });
-      var item = {
-        id: Math.floor(Math.random() * 100000),
-        content: content
-      };
+      if (!column) throw new Error("Cannot add item column not found");
+      return addNewItem();
 
-      if (!column) {
-        throw new Error("Column not found!");
+      function addNewItem() {
+        var newItem = {
+          id: Date.now(),
+          content: content
+        };
+
+        if (newItem) {
+          column.items.push(newItem);
+          (0,_apiHelpers_js__WEBPACK_IMPORTED_MODULE_0__.setDataToStorage)(storageData);
+          return newItem;
+        }
       }
-
-      column.items.push(item);
-      setDataToStorage(data);
-      return item;
     }
   }, {
     key: "updateItem",
     value: function updateItem(itemId, newProps) {
-      var data = getDataFromStorage();
+      var storageData = (0,_apiHelpers_js__WEBPACK_IMPORTED_MODULE_0__.getDataFromStorage)();
 
       var _ref = function () {
-        var _iterator = _createForOfIteratorHelper(data),
+        var _iterator = _createForOfIteratorHelper(storageData),
             _step;
 
         try {
@@ -385,9 +489,7 @@ var KanbanApi = /*#__PURE__*/function () {
               return item.id === itemId;
             });
 
-            if (_item) {
-              return [_item, column];
-            }
+            if (_item) return [_item, column];
           }
         } catch (err) {
           _iterator.e(err);
@@ -399,20 +501,17 @@ var KanbanApi = /*#__PURE__*/function () {
           item = _ref2[0],
           currColumn = _ref2[1];
 
-      if (!item) {
-        throw new Error("Item not found!");
-      }
-
-      updateContent(item, newProps);
-      updateColAndPos(newProps, data, currColumn, item);
-      setDataToStorage(data);
+      if (!item) throw new Error("Cannot update item not found");
+      (0,_apiHelpers_js__WEBPACK_IMPORTED_MODULE_0__.updateItemContent)(item, newProps);
+      (0,_apiHelpers_js__WEBPACK_IMPORTED_MODULE_0__.updateColAndPos)(newProps, storageData, currColumn, item);
+      (0,_apiHelpers_js__WEBPACK_IMPORTED_MODULE_0__.setDataToStorage)(storageData);
     }
   }, {
-    key: "deleteItem",
-    value: function deleteItem(itemId) {
-      var data = getDataFromStorage();
+    key: "deleteColumnItem",
+    value: function deleteColumnItem(itemId) {
+      var storageData = (0,_apiHelpers_js__WEBPACK_IMPORTED_MODULE_0__.getDataFromStorage)();
 
-      var _iterator2 = _createForOfIteratorHelper(data),
+      var _iterator2 = _createForOfIteratorHelper(storageData),
           _step2;
 
       try {
@@ -421,10 +520,7 @@ var KanbanApi = /*#__PURE__*/function () {
           var item = column.items.find(function (item) {
             return item.id === itemId;
           });
-
-          if (item) {
-            column.items.splice(column.items.indexOf(item), 1);
-          }
+          if (item) column.items.splice(column.items.indexOf(item), 1);
         }
       } catch (err) {
         _iterator2.e(err);
@@ -432,18 +528,37 @@ var KanbanApi = /*#__PURE__*/function () {
         _iterator2.f();
       }
 
-      setDataToStorage(data);
+      (0,_apiHelpers_js__WEBPACK_IMPORTED_MODULE_0__.setDataToStorage)(storageData);
     }
   }]);
 
   return KanbanApi;
 }();
 
-var setDataToStorage = function setDataToStorage(kanbanData) {
-  localStorage.setItem("kanban-data", JSON.stringify(kanbanData));
-};
+;
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (KanbanApi);
 
-var getDataFromStorage = function getDataFromStorage() {
+/***/ }),
+
+/***/ "./src/js/apiHelpers.js":
+/*!******************************!*\
+  !*** ./src/js/apiHelpers.js ***!
+  \******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "getDataFromStorage": () => (/* binding */ getDataFromStorage),
+/* harmony export */   "setDataToStorage": () => (/* binding */ setDataToStorage),
+/* harmony export */   "updateColAndPos": () => (/* binding */ updateColAndPos),
+/* harmony export */   "updateItemContent": () => (/* binding */ updateItemContent)
+/* harmony export */ });
+
+
+function setDataToStorage(kanbanData) {
+  localStorage.setItem("kanban-data", JSON.stringify(kanbanData));
+}
+function getDataFromStorage() {
   var kanbanData = localStorage.getItem("kanban-data");
 
   if (!kanbanData) {
@@ -460,28 +575,20 @@ var getDataFromStorage = function getDataFromStorage() {
   }
 
   return JSON.parse(kanbanData);
-};
-
-var updateContent = function updateContent(item, newProps) {
-  item.content = newProps.content === undefined ? item.content : newProps.content;
-};
-
-var updateColAndPos = function updateColAndPos(newProps, data, currColumn, item) {
+}
+function updateItemContent(item, newProps) {
+  item.content = newProps.content !== undefined ? newProps.content : item.content;
+}
+function updateColAndPos(newProps, storageData, currColumn, item) {
   if (newProps.columnId !== undefined && newProps.position !== undefined) {
-    var newColumn = data.find(function (column) {
+    var newColumn = storageData.find(function (column) {
       return column.id === newProps.columnId;
     });
-
-    if (!newColumn) {
-      throw new Error("Column not found!");
-    }
-
+    if (!newColumn) throw new Error("Cannot update column and position");
     currColumn.items.splice(currColumn.items.indexOf(item), 1);
     newColumn.items.splice(newProps.position, 0, item);
   }
-};
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (KanbanApi);
+}
 
 /***/ }),
 
@@ -504,7 +611,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".wrapper {\n  display: flex;\n  justify-content: center;\n  padding: 0.3rem;\n}\n\n.kanban {\n  display: flex;\n  padding: 1rem;\n  width: 35rem;\n  height: 90vh;\n  background: #fcab3b;\n  border-radius: 5px;\n  box-shadow: rgba(0, 0, 0, 0.09) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;\n}\n.kanban-column {\n  flex: 1;\n  width: 10rem;\n  padding: 0 5px;\n}\n.kanban-column:not(:last-child) {\n  margin-right: 1.5rem;\n}\n.kanban-column-title {\n  text-transform: uppercase;\n  font-weight: 700;\n  text-align: center;\n  margin-bottom: 1rem;\n  font-size: 1.2rem;\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;\n  user-select: none;\n  /* preventing accidentally highlights*/\n}\n.kanban-item-input {\n  padding: 10px 15px;\n  box-sizing: border-box;\n  background: white;\n  border: 1px solid #a7a5a5;\n  border-radius: 5px;\n  width: 100%;\n  cursor: pointer;\n  box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 5px;\n}\n.kanban-dropzone {\n  height: 10px;\n  transition: background 0.15s, height 0.15s;\n}\n.kanban-dropzone-active {\n  height: 20px;\n  background: rgba(0, 0, 0, 0.25);\n}\n\n.add-item-btn {\n  width: 100%;\n  padding: 5px;\n  font-size: 1rem;\n  border: none;\n  border-radius: 15px;\n  color: white;\n  cursor: pointer;\n  display: inline-block;\n  font-weight: 600;\n  background: #76b852;\n  /* fallback for old browsers */\n  background: -webkit-linear-gradient(to right, #8DC26F, #76b852);\n  /* Chrome 10-25, Safari 5.1-6 */\n  background: linear-gradient(to right, #8DC26F, #76b852);\n  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */\n  transition: transform 0.2s linear;\n  box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;\n}\n.add-item-btn:hover {\n  background: #6e9657;\n  transform: translateY(4px);\n}", "",{"version":3,"sources":["webpack://./src/style/main.scss"],"names":[],"mappings":"AAAA;EACI,aAAA;EACH,uBAAA;EACA,eAAA;AACD;;AAEA;EACC,aAAA;EACA,aAAA;EACA,YAAA;EACG,YAAA;EACH,mBAAA;EACA,kBAAA;EACG,kLACA;AAAJ;AAMI;EACI,OAAA;EACA,YAAA;EACA,cAAA;AAJR;AAOI;EACI,oBAAA;AALR;AAQI;EACI,yBAAA;EACA,gBAAA;EACA,kBAAA;EACA,mBAAA;EACA,iBAAA;EACA,YAAA;EACA,2CAAA;EACA,iBAAA;EAAmB,sCAAA;AAL3B;AAQI;EACI,kBAAA;EACA,sBAAA;EACA,iBAAA;EACA,yBAAA;EACA,kBAAA;EACA,WAAA;EACA,eAAA;EACA,2CAAA;AANR;AASI;EACI,YAAA;EACH,0CAAA;AAPL;AAUI;EACI,YAAA;EACA,+BAAA;AARR;;AAYA;EACI,WAAA;EACH,YAAA;EACA,eAAA;EACG,YAAA;EACH,mBAAA;EACA,YAAA;EACA,eAAA;EACA,qBAAA;EACA,gBAAA;EACG,mBAAA;EAAsB,8BAAA;EACtB,+DAAA;EAAkE,+BAAA;EAClE,uDAAA;EAAyD,qEAAA;EACzD,iCAAA;EACA,uHACI;AAPR;AAWI;EACI,mBAAA;EACA,0BAAA;AATR","sourcesContent":[".wrapper {\r\n    display: flex;\r\n\tjustify-content: center;\r\n\tpadding: .3rem;\r\n}\r\n\r\n.kanban {\r\n\tdisplay: flex;\r\n\tpadding: 1rem;\r\n\twidth: 35rem;\r\n    height: 90vh;\r\n\tbackground: #fcab3b;\r\n\tborder-radius: 5px;\r\n    box-shadow: \r\n    rgba(0, 0, 0, 0.09) 0px 2px 1px, \r\n    rgba(0, 0, 0, 0.09) 0px 4px 2px, \r\n    rgba(0, 0, 0, 0.09) 0px 8px 4px, \r\n    rgba(0, 0, 0, 0.09) 0px 16px 8px, \r\n    rgba(0, 0, 0, 0.09) 0px 32px 16px;\r\n\r\n    &-column {\r\n        flex: 1;\r\n        width: 10rem;\r\n        padding: 0 5px;\r\n    }\r\n\r\n    &-column:not(:last-child){\r\n        margin-right: 1.5rem;\r\n    }\r\n\r\n    &-column-title {\r\n        text-transform: uppercase;\r\n        font-weight: 700;\r\n        text-align: center;\r\n        margin-bottom: 1rem;\r\n        font-size: 1.2rem;\r\n        color: white;\r\n        text-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;;\r\n        user-select: none; /* preventing accidentally highlights*/\r\n    }\r\n\r\n    &-item-input {\r\n        padding: 10px 15px;\r\n        box-sizing: border-box;\r\n        background: white;\r\n        border: 1px solid #a7a5a5;\r\n        border-radius: 5px;\r\n        width: 100%;\r\n        cursor: pointer;\r\n        box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 5px;\r\n    }\r\n\r\n    &-dropzone {\r\n        height: 10px;\r\n\t    transition: background 0.15s, height 0.15s;\r\n    }\r\n\r\n    &-dropzone-active {\r\n        height: 20px;\r\n        background: rgba(0, 0, 0, 0.25);\r\n    }\r\n}\r\n\r\n.add-item-btn {\r\n    width: 100%;\r\n\tpadding: 5px;\r\n\tfont-size: 1rem;\r\n    border: none;\r\n\tborder-radius: 15px;\r\n\tcolor: white;\r\n\tcursor: pointer;\r\n\tdisplay: inline-block;\r\n\tfont-weight: 600;\r\n    background: #76b852;  /* fallback for old browsers */\r\n    background: -webkit-linear-gradient(to right, #8DC26F, #76b852);  /* Chrome 10-25, Safari 5.1-6 */\r\n    background: linear-gradient(to right, #8DC26F, #76b852); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */\r\n    transition: transform .2s linear;\r\n    box-shadow: \r\n        rgba(0, 0, 0, 0.4) 0px 2px 4px, \r\n        rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, \r\n        rgba(0, 0, 0, 0.2) 0px -3px 0px inset;\r\n\r\n    &:hover {\r\n        background: #6e9657;\r\n        transform: translateY(4px);\r\n    }\r\n}\r\n\r\n"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, ".wrapper {\n  display: flex;\n  justify-content: center;\n  padding: 0.3rem;\n}\n\n.kanban {\n  display: flex;\n  padding: 1rem;\n  width: 35rem;\n  height: 90vh;\n  background: #fcab3b;\n  border-radius: 5px;\n  box-shadow: rgba(0, 0, 0, 0.09) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;\n}\n.kanban-column {\n  flex: 1;\n  width: 10rem;\n  padding: 0 5px;\n}\n.kanban-column:not(:last-child) {\n  margin-right: 1.5rem;\n}\n.kanban-column-title {\n  text-transform: uppercase;\n  font-weight: 700;\n  text-align: center;\n  margin-bottom: 1rem;\n  font-size: 1.2rem;\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;\n  user-select: none;\n  /* preventing accidentally highlights*/\n}\n.kanban-item-content {\n  padding: 10px 15px;\n  box-sizing: border-box;\n  background: white;\n  border: 1px solid #a7a5a5;\n  border-radius: 5px;\n  width: 100%;\n  cursor: pointer;\n  box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 5px;\n}\n.kanban-dropzone {\n  height: 10px;\n  transition: background 0.15s, height 0.15s;\n}\n.kanban-dropzone-active {\n  height: 20px;\n  background: rgba(0, 0, 0, 0.25);\n}\n\n.add-item-btn {\n  width: 100%;\n  padding: 5px;\n  font-size: 1rem;\n  border: none;\n  border-radius: 15px;\n  color: white;\n  cursor: pointer;\n  display: inline-block;\n  font-weight: 600;\n  background: #76b852;\n  /* fallback for old browsers */\n  background: -webkit-linear-gradient(to right, #8DC26F, #76b852);\n  /* Chrome 10-25, Safari 5.1-6 */\n  background: linear-gradient(to right, #8DC26F, #76b852);\n  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */\n  transition: transform 0.2s linear;\n  box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;\n}\n.add-item-btn:hover {\n  background: #6e9657;\n  transform: translateY(4px);\n}", "",{"version":3,"sources":["webpack://./src/style/main.scss"],"names":[],"mappings":"AAAA;EACI,aAAA;EACH,uBAAA;EACA,eAAA;AACD;;AAEA;EACC,aAAA;EACA,aAAA;EACA,YAAA;EACG,YAAA;EACH,mBAAA;EACA,kBAAA;EACG,kLACA;AAAJ;AAMI;EACI,OAAA;EACA,YAAA;EACA,cAAA;AAJR;AAOI;EACI,oBAAA;AALR;AAQI;EACI,yBAAA;EACA,gBAAA;EACA,kBAAA;EACA,mBAAA;EACA,iBAAA;EACA,YAAA;EACA,2CAAA;EACA,iBAAA;EAAmB,sCAAA;AAL3B;AAQI;EACI,kBAAA;EACA,sBAAA;EACA,iBAAA;EACA,yBAAA;EACA,kBAAA;EACA,WAAA;EACA,eAAA;EACA,2CAAA;AANR;AASI;EACI,YAAA;EACH,0CAAA;AAPL;AAUI;EACI,YAAA;EACA,+BAAA;AARR;;AAYA;EACI,WAAA;EACH,YAAA;EACA,eAAA;EACG,YAAA;EACH,mBAAA;EACA,YAAA;EACA,eAAA;EACA,qBAAA;EACA,gBAAA;EACG,mBAAA;EAAsB,8BAAA;EACtB,+DAAA;EAAkE,+BAAA;EAClE,uDAAA;EAAyD,qEAAA;EACzD,iCAAA;EACA,uHACI;AAPR;AAWI;EACI,mBAAA;EACA,0BAAA;AATR","sourcesContent":[".wrapper {\r\n    display: flex;\r\n\tjustify-content: center;\r\n\tpadding: .3rem;\r\n}\r\n\r\n.kanban {\r\n\tdisplay: flex;\r\n\tpadding: 1rem;\r\n\twidth: 35rem;\r\n    height: 90vh;\r\n\tbackground: #fcab3b;\r\n\tborder-radius: 5px;\r\n    box-shadow: \r\n    rgba(0, 0, 0, 0.09) 0px 2px 1px, \r\n    rgba(0, 0, 0, 0.09) 0px 4px 2px, \r\n    rgba(0, 0, 0, 0.09) 0px 8px 4px, \r\n    rgba(0, 0, 0, 0.09) 0px 16px 8px, \r\n    rgba(0, 0, 0, 0.09) 0px 32px 16px;\r\n\r\n    &-column {\r\n        flex: 1;\r\n        width: 10rem;\r\n        padding: 0 5px;\r\n    }\r\n\r\n    &-column:not(:last-child){\r\n        margin-right: 1.5rem;\r\n    }\r\n\r\n    &-column-title {\r\n        text-transform: uppercase;\r\n        font-weight: 700;\r\n        text-align: center;\r\n        margin-bottom: 1rem;\r\n        font-size: 1.2rem;\r\n        color: white;\r\n        text-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;;\r\n        user-select: none; /* preventing accidentally highlights*/\r\n    }\r\n\r\n    &-item-content {\r\n        padding: 10px 15px;\r\n        box-sizing: border-box;\r\n        background: white;\r\n        border: 1px solid #a7a5a5;\r\n        border-radius: 5px;\r\n        width: 100%;\r\n        cursor: pointer;\r\n        box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 5px;\r\n    }\r\n\r\n    &-dropzone {\r\n        height: 10px;\r\n\t    transition: background 0.15s, height 0.15s;\r\n    }\r\n\r\n    &-dropzone-active {\r\n        height: 20px;\r\n        background: rgba(0, 0, 0, 0.25);\r\n    }\r\n}\r\n\r\n.add-item-btn {\r\n    width: 100%;\r\n\tpadding: 5px;\r\n\tfont-size: 1rem;\r\n    border: none;\r\n\tborder-radius: 15px;\r\n\tcolor: white;\r\n\tcursor: pointer;\r\n\tdisplay: inline-block;\r\n\tfont-weight: 600;\r\n    background: #76b852;  /* fallback for old browsers */\r\n    background: -webkit-linear-gradient(to right, #8DC26F, #76b852);  /* Chrome 10-25, Safari 5.1-6 */\r\n    background: linear-gradient(to right, #8DC26F, #76b852); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */\r\n    transition: transform .2s linear;\r\n    box-shadow: \r\n        rgba(0, 0, 0, 0.4) 0px 2px 4px, \r\n        rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, \r\n        rgba(0, 0, 0, 0.2) 0px -3px 0px inset;\r\n\r\n    &:hover {\r\n        background: #6e9657;\r\n        transform: translateY(4px);\r\n    }\r\n}\r\n\r\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1097,10 +1204,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Kanban_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Kanban.js */ "./src/js/Kanban.js");
 
 
-var selector = document.querySelector(".kanban");
-new _Kanban_js__WEBPACK_IMPORTED_MODULE_1__["default"](selector);
+
+
+var kanbanBoard = document.querySelector(".kanban");
+new _Kanban_js__WEBPACK_IMPORTED_MODULE_1__["default"](kanbanBoard);
 })();
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.e4f45f7d8d6b02fbd4d4.js.map
+//# sourceMappingURL=bundle.222f7f46e8d5f9f48377.js.map

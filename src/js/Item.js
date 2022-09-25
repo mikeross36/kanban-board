@@ -1,56 +1,78 @@
+"use strict"
 import KanbanApi from "./KanbanApi.js";
 import DropZone from "./DropZone.js";
 
 class Item {
-    constructor(id, content){
-        const dropZoneBelowe = DropZone.createDropZone()
-
+    constructor(id, content) {
         this.rangeElements = {}
-        this.rangeElements.item = Item.createItem()
-        this.rangeElements.itemInput = this.rangeElements.item.querySelector(".kanban-item-input")
-        this.rangeElements.item.dataset.id = id;
-        this.rangeElements.itemInput.textContent = content;
+        this.setItem(id)
+        this.setItemContent(content)
         this.content = content;
+        this.updateItemContent(id)
+        this.removeItem(id)
+        this.setDropBelow()
+        this.setDragAndDrop(id)
+    }
 
-        this.rangeElements.item.appendChild(dropZoneBelowe)
+    setItem(id) {
+        this.rangeElements.item = Item.createItem()
+        this.rangeElements.item.dataset.id = id;
+    }
 
-        const updateItemsContent = () => {
-            const newContent = this.rangeElements.itemInput.textContent.trim()
-            if(newContent === this.content){
-                return;
-            }
+    setItemContent(content) {
+        const contentEl = this.rangeElements.item.querySelector(".kanban-item-content")
+        if (contentEl) {
+            this.rangeElements.itemContent = contentEl;
+            this.rangeElements.itemContent.textContent = content;
+        }
+    }
+
+    updateItemContent(id) {
+        const updateContent = () => {
+            const newContent = this.rangeElements.itemContent.textContent.trim()
+            if (newContent === this.content) return;
             this.content = newContent;
             KanbanApi.updateItem(id, {content: this.content})
-        };
-        this.rangeElements.itemInput.addEventListener("blur", updateItemsContent)
+        }
+        this.rangeElements.itemContent.addEventListener("blur", updateContent)
+    }
 
-        this.rangeElements.item.addEventListener("dblclick", ()=> {
-            const check = confirm("Are you sure sou want to delete this item?")
-            if(check){
-                KanbanApi.deleteItem(id)
-                this.rangeElements.itemInput.removeEventListener("blur", updateItemsContent)
+    removeItem(id) {
+        this.rangeElements.item.addEventListener("dblclick", () => {
+            const check = confirm("Are you sure your want to delete this item?")
+            if (check) {
+                KanbanApi.deleteColumnItem(id)
+                this.rangeElements.itemContent.removeEventListener("blur", this.updateItemContent)
                 this.rangeElements.item.parentElement.removeChild(this.rangeElements.item)
             }
         })
+    }
 
+    setDropBelow() {
+        const dropZoneBelow = DropZone.setDropZone()
+        if(dropZoneBelow) this.rangeElements.item.appendChild(dropZoneBelow)
+    }
+
+    setDragAndDrop(id) {
         this.rangeElements.item.addEventListener("dragstart", e => {
-            e.dataTransfer.setData("text/plain", id) 
+            e.dataTransfer.setData("text/plain", id)
         })
-  
-        this.rangeElements.itemInput.addEventListener("drop", e => {
-            e.preventDefault() 
+        this.rangeElements.itemContent.addEventListener("drop", e => {
+            e.preventDefault()
         })
     }
 
-    static createItem(){
+    static createItem() {
         const range = document.createRange()
-        range.selectNode(document.body)
         const tagString = `
             <div class="kanban-item" draggable="true">
-                <div class="kanban-item-input" contenteditable></div>
-            </div>`;
-
-        return range.createContextualFragment(tagString).children[0]
+                <div class="kanban-item-content" contenteditable></div>
+            </div>
+        `
+        if (range) {
+            range.selectNode(document.body)
+            return range.createContextualFragment(tagString).children[0]
+        }
     }
 }
 

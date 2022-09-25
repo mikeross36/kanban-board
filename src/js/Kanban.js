@@ -1,3 +1,4 @@
+"use strict"
 import Column from "./Column.js";
 
 class Kanban {
